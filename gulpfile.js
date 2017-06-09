@@ -65,11 +65,12 @@ gulp.task('sass', function (f) {
 //同步刷新
 gulp.task('serve', function () {
     var openUrl = config.chrome.proxy + config.chrome.startPath + __dirname__ + '/dist/html/index.html';
-    if(os.platform() == 'darwin') {
+    if(tab == ';') {
         exec('open -a "/Applications/Google Chrome.app" "' + openUrl + '"');
     } else {
-        console.log(chalk.cyan('调试地址：' + openUrl));
+        exec('start ' + openUrl);
     }
+    console.log(chalk.cyan('调试地址：' + openUrl));
     //同步刷新与nginx冲突
     // browserSync.init({
     //     proxy: config.browserSync.proxy,
