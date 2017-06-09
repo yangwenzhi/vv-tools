@@ -20,6 +20,7 @@ var log = require('./log');
 var __dirname__ = '';
 var __uglify__ = 0;
 var __version__ = 0;
+var tab = os.platform() == 'darwin' ? ';' : '&';
 
 //编译javascript
 gulp.task('scripts', function() {
@@ -67,7 +68,6 @@ gulp.task('serve', function () {
     if(os.platform() == 'darwin') {
         exec('open -a "/Applications/Google Chrome.app" "' + openUrl + '"');
     } else {
-        console.log(os.platform());
         console.log(chalk.cyan('调试地址：' + openUrl));
     }
     //同步刷新与nginx冲突
@@ -104,13 +104,13 @@ gulp.task('default', function(){
                 var _shell = '';
                 if(files.length > 1) {
                     fs.exists('../' + files[0], function (ex) {
-                        if(ex) _shell = 'cd ../' + files[0] + '& mkdir ' + files[1] + '& cd ' + files[1] + '& mkdir src& mkdir dist& cd dist& mkdir html& mkdir css& mkdir js& mkdir .min& cd ../../../vv-tools& cp -rf ./templates1/* ../' + name + '/src';
-                        else _shell = 'cd ..& mkdir ' + files[0] + '& cd ' + files[0] + '& mkdir ' + files[1] + '& cd ' + files[1] + '& mkdir src& mkdir dist& cd dist& mkdir html& mkdir css& mkdir js& mkdir .min& cd ../../../vv-tools& cp -rf ./templates1/* ../' + name + '/src';
+                        if(ex) _shell = 'cd ../' + files[0] + tab + ' mkdir ' + files[1] + tab + ' cd ' + files[1] + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir .min' + tab + ' cd ../../../vv-tools' + tab + ' cp -rf ./templates1/* ../' + name + '/src';
+                        else _shell = 'cd ..' + tab + ' mkdir ' + files[0] + tab + ' cd ' + files[0] + tab + ' mkdir ' + files[1] + tab + ' cd ' + files[1] + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir .min' + tab + ' cd ../../../vv-tools' + tab + ' cp -rf ./templates1/* ../' + name + '/src';
                         log.shell(_shell, name);
                     });
                 }
                 else {
-                    _shell = 'cd ..& mkdir ' + name + '& cd ' + name + '& mkdir src& mkdir dist& cd dist& mkdir html& mkdir css& mkdir js& mkdir .min& cd ../../vv-tools& cp -rf ./templates/* ../' + name + '/src';
+                    _shell = 'cd ..' + tab + ' mkdir ' + name + tab + ' cd ' + name + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir .min' + tab + ' cd ../../vv-tools' + tab + ' cp -rf ./templates/* ../' + name + '/src';
                     log.shell(_shell, name);
                 }
             }
