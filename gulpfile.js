@@ -67,6 +67,7 @@ gulp.task('serve', function () {
     if(os.platform() == 'darwin') {
         exec('open -a "/Applications/Google Chrome.app" "' + openUrl + '"');
     } else {
+        console.log(os.platform());
         console.log(chalk.cyan('调试地址：' + openUrl));
     }
     //同步刷新与nginx冲突
@@ -103,13 +104,13 @@ gulp.task('default', function(){
                 var _shell = '';
                 if(files.length > 1) {
                     fs.exists('../' + files[0], function (ex) {
-                        if(ex) _shell = 'cd ../' + files[0] + '; mkdir ' + files[1] + '; cd ' + files[1] + '; mkdir src; mkdir dist; cd dist; mkdir html; mkdir css; mkdir js; mkdir .min; cd ../../../vv-tools; cp -rf ./templates1/* ../' + name + '/src;';
-                        else _shell = 'cd ..; mkdir ' + files[0] + '; cd ' + files[0] + '; mkdir ' + files[1] + '; cd ' + files[1] + '; mkdir src; mkdir dist; cd dist; mkdir html; mkdir css; mkdir js; mkdir .min; cd ../../../vv-tools; cp -rf ./templates1/* ../' + name + '/src;';
+                        if(ex) _shell = 'cd ../' + files[0] + '& mkdir ' + files[1] + '& cd ' + files[1] + '& mkdir src& mkdir dist& cd dist& mkdir html& mkdir css& mkdir js& mkdir .min& cd ../../../vv-tools& cp -rf ./templates1/* ../' + name + '/src';
+                        else _shell = 'cd ..& mkdir ' + files[0] + '& cd ' + files[0] + '& mkdir ' + files[1] + '& cd ' + files[1] + '& mkdir src& mkdir dist& cd dist& mkdir html& mkdir css& mkdir js& mkdir .min& cd ../../../vv-tools& cp -rf ./templates1/* ../' + name + '/src';
                         log.shell(_shell, name);
                     });
                 }
                 else {
-                    _shell = 'cd ..; mkdir ' + name + '; cd ' + name + '; mkdir src; mkdir dist; cd dist; mkdir html; mkdir css; mkdir js; mkdir .min; cd ../../vv-tools; cp -rf ./templates/* ../' + name + '/src;';
+                    _shell = 'cd ..& mkdir ' + name + '& cd ' + name + '& mkdir src& mkdir dist& cd dist& mkdir html& mkdir css& mkdir js& mkdir .min& cd ../../vv-tools& cp -rf ./templates/* ../' + name + '/src';
                     log.shell(_shell, name);
                 }
             }
