@@ -1,0 +1,6 @@
+# custom
+.idea
+.idea/jsLibraryMappings.xml
+.DS_Store
+* {!.DS_Store}
+node_modules
