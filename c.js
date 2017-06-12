@@ -1,10 +1,10 @@
-var fs = require('fs');
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var uglify = require('gulp-uglify');
-var htmlmin = require('gulp-htmlmin');
-var builder = require('bingo-builder');
-var bingo = new builder({compress : 0});
+var fs = require('fs'),
+    gulp = require('gulp'),
+    gutil = require('gulp-util'),
+    uglify = require('gulp-uglify'),
+    htmlmin = require('gulp-htmlmin'),
+    builder = require('bingo-builder'),
+    bingo = new builder({compress : 0});
 
 var options = {
     removeComments: true,//清除HTML注释

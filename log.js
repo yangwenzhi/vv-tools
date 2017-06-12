@@ -1,5 +1,5 @@
-var chalk = require('chalk');
-var exec = require('child_process').exec;
+var chalk = require('chalk'),
+	exec = require('child_process').exec;
 
 var log = {
 	write: function(arg, exists) {

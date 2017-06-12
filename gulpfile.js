@@ -1,26 +1,22 @@
-var fs = require('fs');
-var os = require('os');
-var chalk = require('chalk');
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var less = require('gulp-less');
-var sass = require('gulp-sass');
-var ejs = require('gulp-ejs');
-var uglify = require('gulp-uglify');
-var minifycss = require('gulp-minify-css');
-var minifyejs = require('gulp-minify-ejs');
-var minimist = require('minimist');
-var argv = minimist(process.argv.slice(2));
-var exec = require('child_process').exec;
-var browserSync = require('browser-sync').create();
-var c = require('./c');
-var config = require('./config');
-var log = require('./log');
+var fs = require('fs'),
+    os = require('os'),
+    chalk = require('chalk'),
+    gulp = require('gulp'),
+    $ = require('gulp-load-plugins')(),
+    gutil = require('gulp-util'),
+    pngquant = require('imagemin-pngquant'),
+    minimist = require('minimist'),
+    argv = minimist(process.argv.slice(2)),
+    exec = require('child_process').exec,
+    // browserSync = require('browser-sync').create(),
+    c = require('./c'),
+    config = require('./config'),
+    log = require('./log');
 
-var __dirname__ = '';
-var __uglify__ = 0;
-var __version__ = 0;
-var tab = os.platform() == 'darwin' ? ';' : '&';
+var __dirname__ = '',
+    __uglify__ = 0,
+    __version__ = 0,
+    tab = os.platform() == 'darwin' ? ';' : '&';
 
 //编译javascript
 gulp.task('scripts', function() {
@@ -35,15 +31,21 @@ gulp.task('scripts', function() {
 });
 
 //编译html
-gulp.task('html', function() {    
+gulp.task('html', function() { 
+    var opts = {
+        removeComments: true,
+        collapseWhitespace: true,
+        minifyJS: true,
+        minifyCSS: true
+    };   
     if(__uglify__) {
         return gulp.src('../'+__dirname__+'/src/html/*.html')
-        .pipe(ejs({version: __version__ ? config.version || new Date().getTime().toString().substr(0, 10) : ''}))
-        .pipe(minifyejs())
+        .pipe($.ejs({version: __version__ ? config.version || new Date().getTime().toString().substr(0, 10) : ''}))
+        .pipe($.htmlmin(opts))
         .pipe(gulp.dest('../'+__dirname__+'/dist/html'));
     } else {
         return gulp.src('../'+__dirname__+'/src/html/*.html')
-        .pipe(ejs({version: __version__ ? config.version || new Date().getTime().toString().substr(0, 10) : ''}))
+        .pipe($.ejs({version: __version__ ? config.version || new Date().getTime().toString().substr(0, 10) : ''}))
         .pipe(gulp.dest('../'+__dirname__+'/dist/html'));
     }
 });
@@ -52,13 +54,30 @@ gulp.task('html', function() {
 gulp.task('sass', function (f) {
     if(__uglify__) {
         return gulp.src('../'+__dirname__+'/src/sass/*.scss')
-        .pipe(sass())
-        .pipe(minifycss())
+        .pipe($.sass())
+        .pipe($.minifyCss())
         .pipe(gulp.dest('../'+__dirname__+'/dist/css'));
     } else {
         return gulp.src('../'+__dirname__+'/src/sass/*.scss')
-        .pipe(sass())
+        .pipe($.sass())
         .pipe(gulp.dest('../'+__dirname__+'/dist/css'));
+    }
+});
+
+//编译images
+gulp.task('images', function () {
+    var opts = {
+        progressive: true,
+        svgoPlugins: [{removeViewBox: false}],
+        use: [pngquant()]
+    };
+    if(__uglify__) {
+        return gulp.src('../'+__dirname__+'/src/images/*')
+        .pipe($.imagemin(opts))
+        .pipe(gulp.dest('../'+__dirname__+'/dist/images'));
+    } else {
+        return gulp.src('../'+__dirname__+'/src/images/*')
+        .pipe(gulp.dest('../'+__dirname__+'/dist/images'));
     }
 });
 
@@ -80,14 +99,15 @@ gulp.task('serve', function () {
 });
 
 //监听文件
-gulp.task('watch', ['scripts', 'html', 'sass'], function() {
+gulp.task('watch', ['scripts', 'html', 'sass', 'images'], function() {
     gulp.watch('../' + __dirname__ + '/src/js/*.js', ['scripts']);
     gulp.watch('../' + __dirname__ + '/src/html/*.html', ['html']);
     gulp.watch('../' + __dirname__ + '/src/sass/*.scss', ['sass']);
+    gulp.watch('../' + __dirname__ + '/src/images/*', ['images']);
 });
 
 //线上发布
-gulp.task('publish', ['scripts', 'html', 'sass']);
+gulp.task('publish', ['scripts', 'html', 'sass', 'images']);
 
 //默认任务
 gulp.task('default', function(){
@@ -104,13 +124,13 @@ gulp.task('default', function(){
                 var _shell = '';
                 if(files.length > 1) {
                     fs.exists('../' + files[0], function (ex) {
-                        if(ex) _shell = 'cd ../' + files[0] + tab + ' mkdir ' + files[1] + tab + ' cd ' + files[1] + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir .min' + tab + ' cd ../../../vv-tools' + tab + ' cp -rf ./templates1/* ../' + name + '/src';
-                        else _shell = 'cd ..' + tab + ' mkdir ' + files[0] + tab + ' cd ' + files[0] + tab + ' mkdir ' + files[1] + tab + ' cd ' + files[1] + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir .min' + tab + ' cd ../../../vv-tools' + tab + ' cp -rf ./templates1/* ../' + name + '/src';
+                        if(ex) _shell = 'cd ../' + files[0] + tab + ' mkdir ' + files[1] + tab + ' cd ' + files[1] + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir images' + tab + ' mkdir .min' + tab + ' cd ../../../vv-tools' + tab + ' cp -rf ./templates1/* ../' + name + '/src';
+                        else _shell = 'cd ..' + tab + ' mkdir ' + files[0] + tab + ' cd ' + files[0] + tab + ' mkdir ' + files[1] + tab + ' cd ' + files[1] + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir images' + tab + ' mkdir .min' + tab + ' cd ../../../vv-tools' + tab + ' cp -rf ./templates1/* ../' + name + '/src';
                         log.shell(_shell, name);
                     });
                 }
                 else {
-                    _shell = 'cd ..' + tab + ' mkdir ' + name + tab + ' cd ' + name + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir .min' + tab + ' cd ../../vv-tools' + tab + ' cp -rf ./templates/* ../' + name + '/src';
+                    _shell = 'cd ..' + tab + ' mkdir ' + name + tab + ' cd ' + name + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir images' + tab + ' mkdir .min' + tab + ' cd ../../vv-tools' + tab + ' cp -rf ./templates/* ../' + name + '/src';
                     log.shell(_shell, name);
                 }
             }
