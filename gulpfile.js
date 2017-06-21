@@ -20,7 +20,7 @@ var __dirname__ = '',
 
 //编译vue
 gulp.task('vue', function() {
-    var webpack_config = require('./webpack.config.js');
+    var webpack_config = require('./webpack.config-common.js');
     return gulp.src('../'+__dirname__+'/src/vue/*.js')
     .pipe($.webpack(webpack_config))
     .pipe(gulp.dest('../'+__dirname__+'/dist/vue'));
