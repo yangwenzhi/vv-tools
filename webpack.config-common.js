@@ -1,19 +1,19 @@
 var webpack = require('webpack'),
-	glob = require('glob'),
-	minimist = require('minimist'),
-	ExtractTextPlugin = require("extract-text-webpack-plugin"),
-	argv = minimist(process.argv.slice(2));
+    glob = require('glob'),
+    minimist = require('minimist'),
+    ExtractTextPlugin = require("extract-text-webpack-plugin"),
+    argv = minimist(process.argv.slice(2));
 
 var __dirname__ = '',
-	WATCH = argv.watch || argv.w,
-	min = argv.min || argv.m,
-	entry = {},
-	plugins = [
-	    new webpack.DefinePlugin(),
-	];
+    WATCH = argv.watch || argv.w,
+    min = argv.min || argv.m,
+    entry = {},
+    plugins = [
+        new webpack.DefinePlugin(),
+    ];
 
 if(argv.watch || argv.w || argv.publish || argv.p) {
-	__dirname__ = argv.watch || argv.w || argv.publish || argv.p;
+    __dirname__ = argv.watch || argv.w || argv.publish || argv.p;
 }
 
 var fsArr = glob.sync('../' + __dirname__ + '/src/vue/**/*.js');
@@ -23,7 +23,7 @@ fsArr.forEach(function(item) {
 });
 
 var webpack_config = {
-	entry: entry,
+    entry: entry,
     output: {
         filename: '[name].js',
     },
@@ -40,9 +40,31 @@ var webpack_config = {
     resolve: {
         extensions: ['', '.js', '.vue'],
     },
-    babel: {
-    　　presets: ['es2015']
-    }
+    module: {
+        loaders: [
+            { 
+                test: /\.vue$/,
+                loader: 'vue-loader'
+            },
+            {
+                test: /\.js$/,
+                loader: 'babel-loader',
+                exclude: /node_modules/,
+                query: {
+                    presets: ['es2015']
+                }
+            },
+            {
+                test: /\.jsx$/,
+                loader: 'babel',
+                exclude: /node_modules/,
+                query: {
+                    presets: ['es2015', 'react']
+                }
+            }
+        ]
+    },
+    watch: WATCH ? true : false,
 };
 
 module.exports = webpack_config;
