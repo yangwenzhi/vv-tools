@@ -18,6 +18,14 @@ var __dirname__ = '',
     __version__ = 0,
     tab = os.platform() == 'darwin' ? ';' : '&';
 
+//编译vue
+gulp.task('vue', function() {
+    var webpack_config = require('./webpack.config.js');
+    return gulp.src('../'+__dirname__+'/src/vue/*.js')
+    .pipe($.webpack(webpack_config))
+    .pipe(gulp.dest('../'+__dirname__+'/dist/vue'));
+});
+
 //编译javascript
 gulp.task('scripts', function() {
     var dir = '../'+__dirname__+'/src/js/';
@@ -100,15 +108,20 @@ gulp.task('serve', function () {
 });
 
 //监听文件
-gulp.task('watch', ['scripts', 'html', 'sass', 'images'], function() {
+gulp.task('watch', ['scripts', 'html', 'sass', 'images', 'vue'], function() {
     gulp.watch('../' + __dirname__ + '/src/js/*.js', ['scripts']);
-    gulp.watch('../' + __dirname__ + '/src/html/*.html', ['html']);
+    gulp.watch('../' + __dirname__ + '/src/html/*', ['html']);
     gulp.watch('../' + __dirname__ + '/src/sass/*.scss', ['sass']);
     gulp.watch('../' + __dirname__ + '/src/images/*', ['images']);
+    gulp.watch('../' + __dirname__ + '/src/vue/*', ['vue']);
+    gulp.watch('../' + __dirname__ + '/src/component/js/*.js', ['scripts']);
+    gulp.watch('../' + __dirname__ + '/src/component/htm/*', ['html']);
+    gulp.watch('../' + __dirname__ + '/src/component/sass/*.scss', ['sass']);
+    gulp.watch('../' + __dirname__ + '/src/component/vue/*', ['vue']);
 });
 
 //线上发布
-gulp.task('publish', ['scripts', 'html', 'sass', 'images']);
+gulp.task('publish', ['scripts', 'html', 'sass', 'images', 'vue']);
 
 //默认任务
 gulp.task('default', function(){
@@ -125,13 +138,13 @@ gulp.task('default', function(){
                 var _shell = '';
                 if(files.length > 1) {
                     fs.exists('../' + files[0], function (ex) {
-                        if(ex) _shell = 'cd ../' + files[0] + tab + ' mkdir ' + files[1] + tab + ' cd ' + files[1] + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir images' + tab + ' mkdir .min' + tab + ' cd ../../../vv-tools' + tab + ' cp -rf ./templates1/* ../' + name + '/src';
-                        else _shell = 'cd ..' + tab + ' mkdir ' + files[0] + tab + ' cd ' + files[0] + tab + ' mkdir ' + files[1] + tab + ' cd ' + files[1] + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir images' + tab + ' mkdir .min' + tab + ' cd ../../../vv-tools' + tab + ' cp -rf ./templates1/* ../' + name + '/src';
+                        if(ex) _shell = 'cd ../' + files[0] + tab + ' mkdir ' + files[1] + tab + ' cd ' + files[1] + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir images' + tab + ' mkdir vue' + tab + ' mkdir .min' + tab + ' cd ../../../vv-tools' + tab + ' cp -rf ./templates1/* ../' + name + '/src';
+                        else _shell = 'cd ..' + tab + ' mkdir ' + files[0] + tab + ' cd ' + files[0] + tab + ' mkdir ' + files[1] + tab + ' cd ' + files[1] + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir images' + tab + ' mkdir vue' + tab + ' mkdir .min' + tab + ' cd ../../../vv-tools' + tab + ' cp -rf ./templates1/* ../' + name + '/src';
                         log.shell(_shell, name);
                     });
                 }
                 else {
-                    _shell = 'cd ..' + tab + ' mkdir ' + name + tab + ' cd ' + name + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir images' + tab + ' mkdir .min' + tab + ' cd ../../vv-tools' + tab + ' cp -rf ./templates/* ../' + name + '/src';
+                    _shell = 'cd ..' + tab + ' mkdir ' + name + tab + ' cd ' + name + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir images' + tab + ' mkdir vue' + tab + ' mkdir .min' + tab + ' cd ../../vv-tools' + tab + ' cp -rf ./templates/* ../' + name + '/src';
                     log.shell(_shell, name);
                 }
             }
