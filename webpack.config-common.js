@@ -61,10 +61,14 @@ var webpack_config = {
                 query: {
                     presets: ['es2015', 'react']
                 }
+            }, 
+            {
+                test: /\.(png|jpg|jpeg|gif|svg|woff|woff2)$/,
+                loader: 'url-loader'
             }
         ]
     },
-    watch: WATCH ? true : false,
+    // watch: WATCH ? true : false,
 };
 
 module.exports = webpack_config;
