@@ -80,11 +80,11 @@ gulp.task('images', function () {
         use: [pngquant()]
     };
     if(__uglify__) {
-        return gulp.src('../'+__dirname__+'/src/images/*')
+        return gulp.src('../'+__dirname__+'/src/images/**')
         .pipe($.imagemin(opts))
         .pipe(gulp.dest('../'+__dirname__+'/dist/images'));
     } else {
-        return gulp.src('../'+__dirname__+'/src/images/*')
+        return gulp.src('../'+__dirname__+'/src/images/**')
         .pipe(gulp.dest('../'+__dirname__+'/dist/images'));
     }
 });
@@ -112,7 +112,7 @@ gulp.task('watch', ['scripts', 'html', 'sass', 'images', 'vue'], function() {
     gulp.watch('../' + __dirname__ + '/src/js/*.js', ['scripts']);
     gulp.watch('../' + __dirname__ + '/src/html/*', ['html']);
     gulp.watch('../' + __dirname__ + '/src/sass/*.scss', ['sass']);
-    gulp.watch('../' + __dirname__ + '/src/images/*', ['images']);
+    gulp.watch('../' + __dirname__ + '/src/images/**', ['images']);
     gulp.watch('../' + __dirname__ + '/src/vue/*', ['vue']);
     gulp.watch('../' + __dirname__ + '/src/component/js/*.js', ['scripts']);
     gulp.watch('../' + __dirname__ + '/src/component/htm/*', ['html']);
