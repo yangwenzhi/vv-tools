@@ -3,22 +3,14 @@
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <title>template</title>
-	<style>
-        html{
-            overflow-y: scroll;
-        }
-        [data-dpr="2"] p, [data-dpr="3"] p,
-        [data-dpr="2"] div, [data-dpr="3"] div {
-            max-height: 100%;
-        }
-    </style>
+	<%- include('../../../vv-base/htm/meta.htm') %>
 	<link rel="stylesheet" type="text/css" href="../css/index.css<%= version ? '?v=' + version : ''%>">
-	<script type="text/javascript" src="../../../vv-base/js/flexible.js"></script>
 </head>
 <body>
 
 	<%- include('../component/htm/aside.htm') %>
-
+    <%- include('../../../vv-base/htm/download.htm') %>
+    <%- include('../../../vv-base/htm/footer.htm') %>
 	<div>
 		index
 	</div>
