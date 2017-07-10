@@ -46,30 +46,18 @@ gulp.task('html', function() {
         minifyJS: true,
         minifyCSS: true
     };   
-    if(__uglify__) {
-        return gulp.src('../'+__dirname__+'/src/html/*.html')
-        .pipe($.ejs({version: __version__ ? config.version || new Date().getTime().toString().substr(0, 10) : ''}))
-        .pipe($.htmlmin(opts))
-        .pipe(gulp.dest('../'+__dirname__+'/dist/html'));
-    } else {
-        return gulp.src('../'+__dirname__+'/src/html/*.html')
-        .pipe($.ejs({version: __version__ ? config.version || new Date().getTime().toString().substr(0, 10) : ''}))
-        .pipe(gulp.dest('../'+__dirname__+'/dist/html'));
-    }
+    return gulp.src('../'+__dirname__+'/src/html/*.html')
+    .pipe($.ejs({version: __version__ ? config.version || new Date().getTime().toString().substr(0, 10) : ''}))
+    .pipe($.if(__uglify__, $.htmlmin(opts)))
+    .pipe(gulp.dest('../'+__dirname__+'/dist/html'));
 });
 
 //编译sass
 gulp.task('sass', function (f) {
-    if(__uglify__) {
-        return gulp.src('../'+__dirname__+'/src/sass/*.scss')
-        .pipe($.sass())
-        .pipe($.minifyCss())
-        .pipe(gulp.dest('../'+__dirname__+'/dist/css'));
-    } else {
-        return gulp.src('../'+__dirname__+'/src/sass/*.scss')
-        .pipe($.sass())
-        .pipe(gulp.dest('../'+__dirname__+'/dist/css'));
-    }
+    return gulp.src('../'+__dirname__+'/src/sass/*.scss')
+    .pipe($.sass())
+    .pipe($.if(__uglify__, $.minifyCss()))
+    .pipe(gulp.dest('../'+__dirname__+'/dist/css'));
 });
 
 //编译images
@@ -79,14 +67,9 @@ gulp.task('images', function () {
         svgoPlugins: [{removeViewBox: false}],
         use: [pngquant()]
     };
-    if(__uglify__) {
-        return gulp.src('../'+__dirname__+'/src/images/**')
-        .pipe($.imagemin(opts))
-        .pipe(gulp.dest('../'+__dirname__+'/dist/images'));
-    } else {
-        return gulp.src('../'+__dirname__+'/src/images/**')
-        .pipe(gulp.dest('../'+__dirname__+'/dist/images'));
-    }
+    return gulp.src('../'+__dirname__+'/src/images/**')
+    .pipe($.if(__uglify__, $.imagemin(opts)))
+    .pipe(gulp.dest('../'+__dirname__+'/dist/images'));
 });
 
 //同步刷新
