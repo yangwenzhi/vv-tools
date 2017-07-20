@@ -1,3 +1,53 @@
-<div>
-    aside
+<span data-id="#clickOpen" id="clickBtn">用于点击弹出窗口加载</span>
+<ul id="clickOpen" class="widget-tab clearfix none ajax-load" data-trigger="show" data-url="http://live.51vv.com/act/event/getMcAnchorList.htm?page=1&rows=10" data-page="jsonp" data-cacheTime="0" temId="j-tmpl" monkey="hotShopping"></ul>
+
+<div class="main E-widget" event-type="clickEvent">
+    <ul class="nav clearfix E-tabs-title">
+        <li class="fl today_nav select">今 日 榜</li>
+        <li class="fl total_nav">总 榜</li>
+    </ul>
+    <ul class="list_runk E-tabs-list ajax-load" data-url="http://live.51vv.com/act/chef/userRankList_total" data-page="websize=3&serversize=9" data-cacheTime="0" temId="j-tmpl-p" data-live="show"></ul>
+    <ul class="list_runk E-tabs-list none ajax-load" data-url="http://live.51vv.com/act/chef/userRankList_total?curPage=1&viewNumber=100" data-cacheTime="20" temId="j-tmpl" data-trigger="show" data-live="show" data-follow="show"></ul>   
 </div>
+
+<script id="j-tmpl" type="text/template">
+    {{ for (var i = 0, l = it.info.length; i < l; i++) { }}
+        <li class="clearfix cursor" data-userid="{{=it.info[i].userid}}">
+
+            {{ if (i < 3) { }}
+                <div class="fl rank rank_{{=i}} "></div>
+            {{ } else { }}
+                <div class="rank fl">{{=i+1}}.</div>
+            {{ } }} 
+            <img src="{{=it.info[i].userimg ? it.info[i].userimg : '../images/defaultPhoto.png'}}" class="E-live user_img fl">
+            
+            <div class="E-live nickname ellipsis fl">{{=it.info[i].nickname.replace(/</g,'<\u00ad')}}</div>
+
+            <!-- <span class="follow followed fr">已关注</span> -->
+            <span data-userid="{{=it.info[i].userid}}" data-followtype="0" class="follow to_followed fr none">关注</span>
+            <span data-userid="{{=it.info[i].userid}}" data-liveid="0" class="live none"></span>
+
+        </li>
+    {{ } }}
+</script>
+
+<script id="j-tmpl-p" type="text/template">
+    {{ for (var i = 0, l = it.info.length; i < l; i++) { }}
+        <li class="clearfix cursor" data-userid="{{=it.info[i].userid}}">
+
+            {{ if (i < 3 && !it.index) { }}
+                <div class="fl rank rank_{{=i}} "></div>
+            {{ } else { }}
+                <div class="rank fl">{{=it.index*l+i+1}}.</div>
+            {{ } }} 
+            <img src="{{=it.info[i].userimg ? it.info[i].userimg : '../images/defaultPhoto.png'}}" class="E-live user_img fl">
+            
+            <div class="E-live nickname ellipsis fl">{{=it.info[i].nickname.replace(/</g,'<\u00ad')}}</div>
+
+            <!-- <span class="follow followed fr">已关注</span> -->
+            <span data-userid="{{=it.info[i].userid}}" data-followtype="0" class="follow to_followed fr none">关注</span>
+            <span data-userid="{{=it.info[i].userid}}" data-liveid="0" class="live none"></span>
+
+        </li>
+    {{ } }}
+</script>

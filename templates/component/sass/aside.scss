@@ -1,1 +1,193 @@
+html,body{
+	background-color:#fab0a9;
+}
+.drow_award{
+	position:fixed;
+	width: 56px;
+	height: 56px;
+	margin-left:300px;
+	left: 50%;
+	top: 200px;
+	background:url(../images/drow_award.png) no-repeat 0 0;
+	z-index: 5;
+	color: #1bafbd;
+	font-size:12px;
+	font-weight: 600;
+	padding-top: 30px;
+	text-align:center;
+	
+}
+.drow_award:hover{
+	background:url(../images/drow_award_hover.png) no-repeat 0 0;
+}
+.outer{
+	position: fixed;
+	width: 124px;
+	height: auto;
+	margin-left:400px;
+	left: 50%;
+	top: 200px;
+	z-index: 6;
+	a{	
+		display: block;
+		width: 124px;
+		height: 26px;
+		background:url(../images/down.png)
+	}
+	a:hover{
+		background:url(../images/down_hover.png)
+	}
+	.qr{
+		display: block;
+		width: 106px;
+		height: 123px;
+		margin: 5px auto 0;
+		background:url(../images/qr.png)
+	}
+}
+.head{
+	background:url(../images/head.png) no-repeat center 0;
+	height:546px;
+	position: relative;
+	.award{
+		width: 600px;
+		margin: 0 auto;
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		margin-left: -300px;
+	}	
+}
+.main{
+	width: 600px;
+	margin: 20px auto 0;
+	background-color:#ffffff;
+	border-radius: 10px;
+	.nav{
+		width: 560px;
+		margin: 0 auto;
+		height: 60px;
+		font-size: 20px;
+		font-weight: 600;
+		li{
+			width: 50%;
+			height: 60px;
+			line-height: 80px;
+			color: #bcbcbc;
+			border-bottom: 2px solid #f3f3f3; 
+			text-align: center;
+		}
+		li.select{
+			color: #ee776f;
+			border-bottom: 2px solid #ee776f; 
+		}
+	}
 
+}
+.express{
+	text-align: center;
+	height: 138px;
+	line-height: 138px;
+	font-size: 14px;
+	color: #c36559;
+}
+
+
+.list_runk{
+	width: 600px;
+	margin: 0 auto;
+	padding:0 20px;
+	overflow-y: scroll;
+	position: relative; 
+	// max-height: 515px; 
+	min-height: 100px;
+	overflow: auto; 
+	li{
+		position: relative; 
+		height: 105px; 
+		line-height: 85px; 
+		border-bottom: 1px solid #f3f3f3; 
+		font-size: 14px; 
+		overflow: hidden;
+		padding:10px 0;
+		:last-child{
+		 border: none; 
+		}
+		.rank{
+			width: 23px;
+			height: 28px;
+			line-height: 28px;
+			text-align: center;
+			margin-top: 28px;
+			color: #999999;
+		}
+		.rank_0{
+			background: url(../images/first.png) no-repeat center; 
+		}
+		.rank_1{
+			background: url(../images/second.png) no-repeat center;
+		}
+		.rank_2{
+			background: url(../images/third.png) no-repeat center;
+		}
+		img{
+			width: 60px;
+			height: 60px;
+			border-radius: 50%;
+			margin: 12px 12px 13px 20px; 
+		}
+		.nickname{
+			width: 133px;
+			font-size: 16px;
+			color: #6a6969;
+		}
+		.gift_num{
+			//width: 88px;
+			margin: 0 90px 0 36px;
+			font-size: 14px;
+			color: #999999; 
+			span{
+				color: #f07f72;
+			}
+		}
+
+		.follow{
+			width: 56px;
+			height: 26px;
+			line-height: 26px;
+			margin-top: 29px;
+			font-size: 12px;
+			text-align: center;
+		}
+		.followed{
+			color: #dcdcdc;
+		}
+		.to_followed{
+			color: #fff;
+			background-color: #fc9891;
+			border-radius: 30px;
+		}
+		.live{
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 52px;
+			height: 16px;
+			background: url(../images/live.png) no-repeat center;
+		}
+
+	}
+	li:last-child{
+		border-bottom:none;
+	}
+	.empty{
+		height: 85px;
+		line-height: 85px;
+		color: #6a6969;
+		text-align: center;
+	}	
+}
+
+.ajax-load{
+    background: url(../images/loading.gif) no-repeat center 25%;
+}

@@ -2,6 +2,4 @@
 @import '../../../../vv-base/sass/download';
 @import '../../../../vv-base/sass/footer';
 
-body{
-    padding: px2rem(0);
-}
+@import '../component/sass/aside';
