@@ -1,63 +1,7 @@
 html,body{
 	background-color:#fab0a9;
 }
-.drow_award{
-	position:fixed;
-	width: 56px;
-	height: 56px;
-	margin-left:300px;
-	left: 50%;
-	top: 200px;
-	background:url(../images/drow_award.png) no-repeat 0 0;
-	z-index: 5;
-	color: #1bafbd;
-	font-size:12px;
-	font-weight: 600;
-	padding-top: 30px;
-	text-align:center;
-	
-}
-.drow_award:hover{
-	background:url(../images/drow_award_hover.png) no-repeat 0 0;
-}
-.outer{
-	position: fixed;
-	width: 124px;
-	height: auto;
-	margin-left:400px;
-	left: 50%;
-	top: 200px;
-	z-index: 6;
-	a{	
-		display: block;
-		width: 124px;
-		height: 26px;
-		background:url(../images/down.png)
-	}
-	a:hover{
-		background:url(../images/down_hover.png)
-	}
-	.qr{
-		display: block;
-		width: 106px;
-		height: 123px;
-		margin: 5px auto 0;
-		background:url(../images/qr.png)
-	}
-}
-.head{
-	background:url(../images/head.png) no-repeat center 0;
-	height:546px;
-	position: relative;
-	.award{
-		width: 600px;
-		margin: 0 auto;
-		position: absolute;
-		bottom: 0;
-		left: 50%;
-		margin-left: -300px;
-	}	
-}
+
 .main{
 	width: 600px;
 	margin: 20px auto 0;
@@ -82,25 +26,15 @@ html,body{
 			border-bottom: 2px solid #ee776f; 
 		}
 	}
-
-}
-.express{
-	text-align: center;
-	height: 138px;
-	line-height: 138px;
-	font-size: 14px;
-	color: #c36559;
 }
 
-
-.list_runk{
+.list{
 	width: 600px;
 	margin: 0 auto;
 	padding:0 20px;
 	overflow-y: scroll;
 	position: relative; 
-	// max-height: 515px; 
-	min-height: 100px;
+	height: 500px;
 	overflow: auto; 
 	li{
 		position: relative; 
@@ -111,7 +45,7 @@ html,body{
 		overflow: hidden;
 		padding:10px 0;
 		:last-child{
-		 border: none; 
+			border: none; 
 		}
 		.rank{
 			width: 23px;
@@ -141,16 +75,6 @@ html,body{
 			font-size: 16px;
 			color: #6a6969;
 		}
-		.gift_num{
-			//width: 88px;
-			margin: 0 90px 0 36px;
-			font-size: 14px;
-			color: #999999; 
-			span{
-				color: #f07f72;
-			}
-		}
-
 		.follow{
 			width: 56px;
 			height: 26px;
@@ -191,4 +115,3 @@ html,body{
 .ajax-load{
     background: url(../images/loading.gif) no-repeat center 25%;
 }
-
