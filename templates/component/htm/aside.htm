@@ -25,7 +25,7 @@
             {{ } else { }}
                 <div class="rank fl">{{=i+1}}.</div>
             {{ } }} 
-            <img src="{{=it.info[i].userimg ? it.info[i].userimg : '../images/defaultPhoto.png'}}" class="E-live user_img fl">
+            <img src="{{=it.info[i].userimg ? it.info[i].userimg : '../images/default.png'}}" class="E-live user_img fl">
             
             <div class="E-live nickname ellipsis fl">{{=it.info[i].nickname.replace(/</g,'<\u00ad')}}</div>
 
@@ -46,7 +46,7 @@
             {{ } else { }}
                 <div class="rank fl">{{=it.index*l+i+1}}.</div>
             {{ } }} 
-            <img src="{{=it.info[i].userimg ? it.info[i].userimg : '../images/defaultPhoto.png'}}" class="E-live user_img fl">
+            <img src="{{=it.info[i].userimg ? it.info[i].userimg : '../images/default.png'}}" class="E-live user_img fl">
             
             <div class="E-live nickname ellipsis fl">{{=it.info[i].nickname.replace(/</g,'<\u00ad')}}</div>
 
