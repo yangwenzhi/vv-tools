@@ -34,7 +34,7 @@ html,body{
 	padding:0 20px;
 	overflow-y: scroll;
 	position: relative; 
-	height: 500px;
+	min-height: 200px;
 	overflow: auto; 
 	li{
 		position: relative; 
