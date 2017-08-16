@@ -16,12 +16,15 @@ var fs = require('fs'),
 var __dirname__ = '',
     __uglify__ = 0,
     __version__ = 0,
+    __file__ = '',
     tab = os.platform() == 'darwin' ? ';' : '&';
 
 //编译vue
 gulp.task('vue', function() {
     var webpack_config = require('./webpack.config-common.js');
-    return gulp.src('../'+__dirname__+'/src/vue/*.js')
+    var p = '../'+__dirname__+'/src/vue/*.js';
+    if(__file__) p = '../'+__dirname__+'/src/vue/'+__file__+'.js';
+    return gulp.src(p)
     .pipe($.webpack(webpack_config))
     .pipe(gulp.dest('../'+__dirname__+'/dist/vue'));
 });
@@ -30,10 +33,17 @@ gulp.task('vue', function() {
 gulp.task('scripts', function() {
     var dir = '../'+__dirname__+'/src/js/';
     fs.exists(dir, function (exists) {
-        if (!exists) return;
-        var files = fs.readdirSync(dir);
-        for(var f in files) {
-            c.js(dir+files[f], __dirname__, __uglify__);
+        if(!exists) return;
+        if(__file__) {
+            fs.exists(dir+__file__+'.js', function(exists){
+                if(!exists) return;
+                c.js(dir+__file__+'.js', __dirname__, __uglify__);
+            });
+        } else {
+            var files = fs.readdirSync(dir);
+            for(var f in files) {
+                c.js(dir+files[f], __dirname__, __uglify__);
+            }
         }
     });
 });
@@ -45,8 +55,10 @@ gulp.task('html', function() {
         collapseWhitespace: true,
         minifyJS: true,
         minifyCSS: true
-    };   
-    return gulp.src('../'+__dirname__+'/src/html/*.html')
+    };
+    var p = '../'+__dirname__+'/src/html/*.html';
+    if(__file__) p = '../'+__dirname__+'/src/html/'+__file__+'.html';
+    return gulp.src(p)
     .pipe($.ejs({version: __version__ ? config.version || new Date().getTime().toString().substr(0, 10) : ''}))
     .pipe($.if(__uglify__, $.htmlmin(opts)))
     .pipe(gulp.dest('../'+__dirname__+'/dist/html'));
@@ -54,7 +66,9 @@ gulp.task('html', function() {
 
 //编译sass
 gulp.task('sass', function (f) {
-    return gulp.src('../'+__dirname__+'/src/sass/*.scss')
+    var p = '../'+__dirname__+'/src/sass/*.scss';
+    if(__file__) p = '../'+__dirname__+'/src/sass/'+__file__+'.scss';
+    return gulp.src(p)
     .pipe($.sass())
     .pipe($.if(__uglify__, $.minifyCss()))
     .pipe(gulp.dest('../'+__dirname__+'/dist/css'));
@@ -67,9 +81,15 @@ gulp.task('images', function () {
         svgoPlugins: [{removeViewBox: false}],
         use: [pngquant()]
     };
-    return gulp.src('../'+__dirname__+'/src/images/**')
+    var p = '../'+__dirname__+'/src/images/**';
+    var d = '../'+__dirname__+'/dist/images';
+    if(__file__) {
+        p = '../'+__dirname__+'/src/images/'+__file__+'/**';
+        d = '../'+__dirname__+'/dist/images/'+__file__;
+    }
+    return gulp.src(p)
     .pipe($.if(__uglify__, $.imagemin(opts)))
-    .pipe(gulp.dest('../'+__dirname__+'/dist/images'));
+    .pipe(gulp.dest(d));
 });
 
 //同步刷新
@@ -138,6 +158,7 @@ gulp.task('default', function(){
         __dirname__ = argv.watch || argv.w;
         __uglify__ = (argv.min || argv.m) ? 1 : 0;
         __version__ = argv.V ? 1 : 0;
+        __file__ = argv.file || argv.f;
         var dir = '../' + __dirname__;
         fs.exists(dir, function (exists) {
             if(exists) {
@@ -152,6 +173,7 @@ gulp.task('default', function(){
         __dirname__ = argv.publish || argv.p;
         __uglify__ = 1;
         __version__ = argv.V ? 1 : 0;
+        __file__ = argv.file || argv.f;
         var dir = '../' + __dirname__;
         fs.exists(dir, function (exists) {
             if(exists) gulp.start('publish');
