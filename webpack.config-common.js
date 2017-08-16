@@ -5,6 +5,7 @@ var webpack = require('webpack'),
     argv = minimist(process.argv.slice(2));
 
 var __dirname__ = '',
+    __file__ = '',
     WATCH = argv.watch || argv.w,
     min = argv.min || argv.m,
     entry = {},
@@ -16,7 +17,13 @@ if(argv.watch || argv.w || argv.publish || argv.p) {
     __dirname__ = argv.watch || argv.w || argv.publish || argv.p;
 }
 
+if(argv.file || argv.f) {
+    __file__ = argv.file || argv.f;
+}
+
 var fsArr = glob.sync('../' + __dirname__ + '/src/vue/**/*.js');
+
+if(__file__) fsArr = glob.sync('../' + __dirname__ + '/src/vue/**/' + __file__ + '.js');
 
 fsArr.forEach(function(item) {
     entry[item.replace('../' + __dirname__ + '/src/vue/', '').replace('.js', '')] = item;
