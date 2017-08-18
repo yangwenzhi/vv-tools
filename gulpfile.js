@@ -17,7 +17,7 @@ var __dirname__ = '',
     __uglify__ = 0,
     __version__ = 0,
     __file__ = '',
-    tab = os.platform() == 'darwin' ? ';' : '&';
+    tab = (os.platform() == 'darwin' || os.platform() == 'linux') ? ';' : '&';
 
 //编译vue
 gulp.task('vue', function() {
