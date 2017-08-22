@@ -171,7 +171,7 @@ gulp.task('default', function(){
     }
     if(argv.publish || argv.p) {
         __dirname__ = argv.publish || argv.p;
-        __uglify__ = 1;
+        __uglify__ = (argv.min || argv.m) ? 1 : 0;
         __version__ = argv.V ? 1 : 0;
         __file__ = argv.file || argv.f;
         var dir = '../' + __dirname__;
