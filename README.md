@@ -12,5 +12,5 @@
 
 使用说明
 ```
-　　http://172.16.1.47/docs/vv-live-pc/vv-tools%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97.html
+　　http://172.16.1.47/docs/vv-live-pc/vv-tools使用指南.html
 ```
