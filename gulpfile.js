@@ -17,6 +17,7 @@ var __dirname__ = '',
     __uglify__ = 0,
     __version__ = 0,
     __file__ = '',
+    __root__ = '',
     tab = (os.platform() == 'darwin' || os.platform() == 'linux') ? ';' : '&';
 
 //编译vue
@@ -57,11 +58,13 @@ gulp.task('html', function() {
         minifyCSS: true
     };
     var p = '../'+__dirname__+'/src/html/*.html';
+    var d = '/dist/html';
     if(__file__) p = '../'+__dirname__+'/src/html/'+__file__+'.html';
+    if(__root__) d = '/';
     return gulp.src(p)
     .pipe($.ejs({version: __version__ ? config.version || new Date().getTime().toString().substr(0, 10) : ''}))
     .pipe($.if(__uglify__, $.htmlmin(opts)))
-    .pipe(gulp.dest('../'+__dirname__+'/dist/html'));
+    .pipe(gulp.dest('../'+__dirname__+d));
 });
 
 //编译sass
@@ -159,6 +162,7 @@ gulp.task('default', function(){
         __uglify__ = (argv.min || argv.m) ? 1 : 0;
         __version__ = argv.V ? 1 : 0;
         __file__ = argv.file || argv.f;
+        __root__ = argv.root || argv.r;
         var dir = '../' + __dirname__;
         fs.exists(dir, function (exists) {
             if(exists) {
@@ -174,6 +178,7 @@ gulp.task('default', function(){
         __uglify__ = (argv.min || argv.m) ? 1 : 0;
         __version__ = argv.V ? 1 : 0;
         __file__ = argv.file || argv.f;
+        __root__ = argv.root || argv.r;
         var dir = '../' + __dirname__;
         fs.exists(dir, function (exists) {
             if(exists) gulp.start('publish');
