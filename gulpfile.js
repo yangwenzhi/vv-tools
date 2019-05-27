@@ -1,172 +1,209 @@
-var fs = require('fs'),
-    os = require('os'),
-    chalk = require('chalk'),
-    gulp = require('gulp'),
-    $ = require('gulp-load-plugins')(),
-    gutil = require('gulp-util'),
-    pngquant = require('imagemin-pngquant'),
-    minimist = require('minimist'),
-    argv = minimist(process.argv.slice(2)),
-    exec = require('child_process').exec,
-    // browserSync = require('browser-sync').create(),
-    c = require('./c'),
-    config = require('./config'),
-    log = require('./log');
+const path           = require('path');
+const fs             = require('fs');
+const os             = require('os');
+const chalk          = require('chalk');
+const gulp           = require('gulp');
+const $              = require('gulp-load-plugins')();
+const pngquant       = require('imagemin-pngquant');
+const minimist       = require('minimist');
+const argv           = minimist(process.argv.slice(2));
+const exec           = require('child_process').exec;
+const runSequence    = require('run-sequence');
+const rev            = require('gulp-rev');
+const revCollector   = require('gulp-rev-collector');
+const clean          = require('gulp-clean');
+const config         = require('./config');
+const log            = require('./log');
+const webpack_config = require('./webpack.config-common');
+const c              = require('./c');
 
-var __dirname__ = '',
-    __uglify__ = 0,
-    __version__ = 0,
-    __file__ = '',
-    __root__ = '',
-    tab = (os.platform() == 'darwin' || os.platform() == 'linux') ? ';' : '&';
+let options = {
+    publish    : argv.p || argv.publish ? true : false,
+    version    : argv.V || false,
+    uglify     : argv.min || argv.m || false,
+    root       : argv.root || argv.r || false,
+    serve      : argv.serve || argv.s || false,
+    dircreate  : argv.create || argv.c,
+    dirname    : argv.w || argv.p || argv.watch || argv.publish,
+    file       : argv.file || argv.f,
+    filename   : argv.file || argv.f || '*',
+    imagefiles : argv.file || argv.f || '',
+    tabs       : os.platform() == ('darwin' || 'linux') ? ';' : '&'
+};
+
+console.log(options);
+
+//创建
+gulp.task('create', function (done) {
+    let dir   = path.resolve('..', options.dircreate);
+    let src   = path.resolve(dir, 'src');
+    let files = options.dircreate.split('/');
+    let shell = 'mkdir ' + dir + options.tabs + 'mkdir ' + src + options.tabs;
+
+    if(files.length > 1) {
+        let file = path.resolve('..', files[0]);
+        fs.exists(file, function (exists) {
+            if(!exists) exec('mkdir ' + file);
+            shell += 'cp -rf ./templates1/* ' + src;
+            log.shell(shell, options.dircreate);
+        });
+    } else {
+        shell += 'cp -rf ./templates/* ' + src;
+        log.shell(shell, options.dircreate);
+    }
+});
 
 //编译vue
-gulp.task('vue', function() {
-    var webpack_config = require('./webpack.config-common.js');
-    var p = '../'+__dirname__+'/src/vue/*.js';
-    if(__file__) p = '../'+__dirname__+'/src/vue/'+__file__+'.js';
-    return gulp.src(p)
-    .pipe($.webpack(webpack_config))
-    .pipe(gulp.dest('../'+__dirname__+'/dist/vue'));
+gulp.task('vue', function () {
+    let src  = path.resolve('..', options.dirname, 'src/vue', options.filename + '.js');
+    let dist = path.resolve('..', options.dirname, 'dist/vue');
+    return gulp.src(src)
+        .pipe($.webpack(webpack_config))
+        .pipe($.if(options.publish, rev()))
+        .pipe($.if(options.publish, gulp.dest(dist)))
+        .pipe($.if(options.publish, rev.manifest()))
+        .pipe(gulp.dest(dist));
+});
+
+//编译sass
+gulp.task('sass', function () {
+    let src  = path.resolve('..', options.dirname, 'src/sass', options.filename + '.scss');
+    let dist = path.resolve('..', options.dirname, 'dist/css');
+    return gulp.src(src)
+        .pipe($.sass())
+        .pipe($.if(options.uglify, $.minifyCss()))
+        .pipe($.if(options.publish, rev()))
+        .pipe($.if(options.publish, gulp.dest(dist)))
+        .pipe($.if(options.publish, rev.manifest()))
+        .pipe(gulp.dest(dist));
+});
+
+//编译images
+gulp.task('images', function () {
+    let opts = {
+        progressive: true,
+        svgoPlugins: [{removeViewBox: false}],
+        use: [pngquant()]
+    };
+    let src  = path.resolve('..', options.dirname, 'src/images', options.imagefiles, '**');
+    let dist = path.resolve('..', options.dirname, 'dist/images', options.imagefiles);
+    return gulp.src(src)
+        .pipe($.if(options.uglify, $.imagemin(opts)))
+        .pipe($.if(options.publish, rev()))
+        .pipe($.if(options.publish, gulp.dest(dist)))
+        .pipe($.if(options.publish, rev.manifest()))
+        .pipe(gulp.dest(dist));
 });
 
 //编译javascript
-gulp.task('scripts', function() {
-    var dir = '../'+__dirname__+'/src/js/';
-    fs.exists(dir, function (exists) {
-        if(!exists) return;
-        if(__file__) {
-            fs.exists(dir+__file__+'.js', function(exists){
-                if(!exists) return;
-                c.js(dir+__file__+'.js', __dirname__, __uglify__);
-            });
-        } else {
-            var files = fs.readdirSync(dir);
-            for(var f in files) {
-                c.js(dir+files[f], __dirname__, __uglify__);
-            }
-        }
+gulp.task('scripts', function () {
+    let src  = path.resolve('..', options.dirname, 'src/js');
+    let dist = path.resolve('..', options.dirname, 'dist/js');
+    let files = [];
+    if(options.file) files.push(options.file + '.js');
+    else files = fs.readdirSync(src);
+
+    fs.exists(dist, function (exists) {
+        if(!exists) fs.mkdirSync(dist);
+        files.forEach(function(item) {
+            if(/\.js/gi.test(item)) c.js(item, options.dirname, options.uglify, options.publish);
+        });
     });
 });
 
 //编译html
-gulp.task('html', function() { 
-    var opts = {
+gulp.task('html', function () {
+    let opts = {
         removeComments: true,
         collapseWhitespace: true,
         minifyJS: true,
         minifyCSS: true
     };
-    var p = '../'+__dirname__+'/src/html/*.html';
-    var d = '/dist/html';
-    if(__file__) p = '../'+__dirname__+'/src/html/'+__file__+'.html';
-    if(__root__) d = '/';
-    return gulp.src(p)
-    .pipe($.ejs({version: __version__ ? config.version || new Date().getTime().toString().substr(0, 10) : ''}))
-    .pipe($.if(__uglify__, $.htmlmin(opts)))
-    .pipe(gulp.dest('../'+__dirname__+d));
+    let src  = path.resolve('..', options.dirname, 'src/html', options.filename + '.html');
+    let dist = path.resolve('..', options.dirname, options.root ? '' : 'dist/html');
+    return gulp.src(src)
+        .pipe($.ejs({version: options.version ? config.version || new Date().getTime().toString().substr(0, 10) : ''}))
+        .pipe($.if(options.uglify, $.htmlmin(opts)))
+        .pipe(gulp.dest(dist));
 });
 
-//编译sass
-gulp.task('sass', function (f) {
-    var p = '../'+__dirname__+'/src/sass/*.scss';
-    if(__file__) p = '../'+__dirname__+'/src/sass/'+__file__+'.scss';
-    return gulp.src(p)
-    .pipe($.sass())
-    .pipe($.if(__uglify__, $.minifyCss()))
-    .pipe(gulp.dest('../'+__dirname__+'/dist/css'));
-});
-
-//编译images
-gulp.task('images', function () {
-    var opts = {
-        progressive: true,
-        svgoPlugins: [{removeViewBox: false}],
-        use: [pngquant()]
-    };
-    var p = '../'+__dirname__+'/src/images/**';
-    var d = '../'+__dirname__+'/dist/images';
-    if(__file__) {
-        p = '../'+__dirname__+'/src/images/'+__file__+'/**';
-        d = '../'+__dirname__+'/dist/images/'+__file__;
-    }
-    return gulp.src(p)
-    .pipe($.if(__uglify__, $.imagemin(opts)))
-    .pipe(gulp.dest(d));
-});
 
 //同步刷新
 gulp.task('serve', function () {
-    var openUrl = config.chrome.proxy + config.chrome.startPath + __dirname__ + '/dist/html/index.html';
-    if(tab == ';') {
+    let openUrl = config.chrome.proxy + config.chrome.startPath + options.dirname + '/dist/html/index.html';
+    if(options.tabs == ';') {
         exec('open -a "/Applications/Google Chrome.app" "' + openUrl + '"');
     } else {
         exec('start ' + openUrl);
     }
     console.log(chalk.cyan('调试地址：' + openUrl));
-    //同步刷新与nginx冲突
-    // browserSync.init({
-    //     proxy: config.browserSync.proxy,
-    //     port: config.browserSync.port,
-    //     files: ['../' + __dirname__ + '/**'],
-    //     startPath: config.browserSync.startPath + __dirname__ + '/dist/html/index.html',
-    // });
+});
+
+//本地开发
+gulp.task('dev', function (done) {
+    //依次顺序执行
+    runSequence(
+        ['vue'],
+        ['sass'],
+        ['images'],
+        ['scripts'],
+        ['html'],
+        done);
+});
+
+//线上部署
+gulp.task('online', function (done) {
+    //依次顺序执行
+    runSequence(
+        ['clean'],
+        ['vue'],
+        ['sass'],
+        ['images'],
+        ['scripts'],
+        ['html'],
+        ['revHtmlVue'],
+        ['revHtmlCss'],
+        ['revHtmlImg'],
+        ['revHtmlJs'],
+        ['revCssImg'],
+        ['cleanManifest'],
+        done);
 });
 
 //监听文件
-gulp.task('watch', ['scripts', 'html', 'sass', 'images', 'vue'], function() {
-    gulp.watch('../' + __dirname__ + '/src/js/*.js', ['scripts']);
-    gulp.watch('../' + __dirname__ + '/src/html/*', ['html']);
-    gulp.watch('../' + __dirname__ + '/src/sass/*.scss', ['sass']);
-    gulp.watch('../' + __dirname__ + '/src/images/**', ['images']);
-    gulp.watch('../' + __dirname__ + '/src/vue/*', ['vue']);
-    gulp.watch('../' + __dirname__ + '/src/component/js/*.js', ['scripts']);
-    gulp.watch('../' + __dirname__ + '/src/component/htm/*', ['html']);
-    gulp.watch('../' + __dirname__ + '/src/component/sass/*.scss', ['sass']);
-    gulp.watch('../' + __dirname__ + '/src/component/vue/*', ['vue']);
+gulp.task('watch', ['dev'], function() {
+    let dir = path.resolve('..', options.dirname);
+    gulp.watch(path.resolve(dir, 'src/component/vue/*'), ['vue']);
+    gulp.watch(path.resolve(dir, 'src/component/sass/*.scss'), ['sass']);
+    gulp.watch(path.resolve(dir, 'src/component/js/*.js'), ['scripts']);
+    gulp.watch(path.resolve(dir, 'src/component/htm/*'), ['html']);
+    gulp.watch(path.resolve(dir, 'src/vue/*'), ['vue']);
+    gulp.watch(path.resolve(dir, 'src/sass/*.scss'), ['sass']);
+    gulp.watch(path.resolve(dir, 'src/images/**'), ['images']);
+    gulp.watch(path.resolve(dir, 'src/js/*.js'), ['scripts']);
+    gulp.watch(path.resolve(dir, 'src/html/*'), ['html']);
 });
 
 //线上发布
-gulp.task('publish', ['scripts', 'html', 'sass', 'images', 'vue']);
+gulp.task('publish', ['online']);
 
 //默认任务
-gulp.task('default', function(){
+gulp.task('default', function() {
     if(typeof argv.create == 'boolean' || typeof argv.c == 'boolean') {
         log.write('a');
         return;
     }
     if(argv.create || argv.c) {
-        var name = argv.create || argv.c;
-        var files = name.split('/');
-        fs.exists('../' + name, function (exists) {
-            if(exists) log.write(name, exists);
-            else {
-                var _shell = '';
-                if(files.length > 1) {
-                    fs.exists('../' + files[0], function (ex) {
-                        if(ex) _shell = 'cd ../' + files[0] + tab + ' mkdir ' + files[1] + tab + ' cd ' + files[1] + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir images' + tab + ' mkdir vue' + tab + ' mkdir .min' + tab + ' cd ../../../vv-tools' + tab + ' cp -rf ./templates1/* ../' + name + '/src';
-                        else _shell = 'cd ..' + tab + ' mkdir ' + files[0] + tab + ' cd ' + files[0] + tab + ' mkdir ' + files[1] + tab + ' cd ' + files[1] + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir images' + tab + ' mkdir vue' + tab + ' mkdir .min' + tab + ' cd ../../../vv-tools' + tab + ' cp -rf ./templates1/* ../' + name + '/src';
-                        log.shell(_shell, name);
-                    });
-                }
-                else {
-                    _shell = 'cd ..' + tab + ' mkdir ' + name + tab + ' cd ' + name + tab + ' mkdir src' + tab + ' mkdir dist' + tab + ' cd dist' + tab + ' mkdir html' + tab + ' mkdir css' + tab + ' mkdir js' + tab + ' mkdir images' + tab + ' mkdir vue' + tab + ' mkdir .min' + tab + ' cd ../../vv-tools' + tab + ' cp -rf ./templates/* ../' + name + '/src';
-                    log.shell(_shell, name);
-                }
-            }
+        fs.exists(path.resolve('..', options.dircreate), function (exists) {
+            if(exists) log.write(options.dircreate, exists);
+            else gulp.start('create');
         });
         return;
     }
     if(argv.watch || argv.w) {
-        __dirname__ = argv.watch || argv.w;
-        __uglify__ = (argv.min || argv.m) ? 1 : 0;
-        __version__ = argv.V ? 1 : 0;
-        __file__ = argv.file || argv.f;
-        __root__ = argv.root || argv.r;
-        var dir = '../' + __dirname__;
-        fs.exists(dir, function (exists) {
+        fs.exists(path.resolve('..', options.dirname.toString()), function (exists) {
             if(exists) {
-                if(argv.serve || argv.s) gulp.start(['watch', 'serve']);
+                if(options.serve) gulp.start(['watch', 'serve']);
                 else gulp.start('watch');
             }
             else log.write('c');
@@ -174,13 +211,7 @@ gulp.task('default', function(){
         return;
     }
     if(argv.publish || argv.p) {
-        __dirname__ = argv.publish || argv.p;
-        __uglify__ = (argv.min || argv.m) ? 1 : 0;
-        __version__ = argv.V ? 1 : 0;
-        __file__ = argv.file || argv.f;
-        __root__ = argv.root || argv.r;
-        var dir = '../' + __dirname__;
-        fs.exists(dir, function (exists) {
+        fs.exists(path.resolve('..', options.dirname.toString()), function (exists) {
             if(exists) gulp.start('publish');
             else log.write('c');
         });
@@ -191,4 +222,74 @@ gulp.task('default', function(){
         return;
     }
     log.write('h');
+});
+
+//清空编译后文件
+gulp.task('clean', function(){
+    let src = path.resolve('..', options.dirname, 'dist/*');
+    return gulp.src(src)
+        .pipe(clean({force: true}));
+});
+
+//清空rev-manifest.json
+gulp.task('cleanManifest', function(){
+    let src = path.resolve('..', options.dirname, 'dist');
+    let config_src = [
+        path.resolve(src, 'vue/rev-manifest.json'),
+        path.resolve(src, 'css/rev-manifest.json'),
+        path.resolve(src, 'images/rev-manifest.json'),
+        path.resolve(src, 'js/rev-manifest.json')
+    ];
+    return gulp.src(config_src)
+        .pipe(clean({force: true}));
+})
+
+//Html替换vue文件版本
+gulp.task('revHtmlVue', function () {
+    let json = path.resolve('..', options.dirname, 'dist/vue/*.json');
+    let src  = path.resolve('..', options.dirname, 'dist/html/*.html');
+    let dist = path.resolve('..', options.dirname, 'dist/html');
+    return gulp.src([json, src])
+        .pipe(revCollector())
+        .pipe(gulp.dest(dist));
+});
+
+//Html替换css文件版本
+gulp.task('revHtmlCss', function () {
+    let json = path.resolve('..', options.dirname, 'dist/css/*.json');
+    let src  = path.resolve('..', options.dirname, 'dist/html/*.html');
+    let dist = path.resolve('..', options.dirname, 'dist/html');
+    return gulp.src([json, src])
+        .pipe(revCollector())
+        .pipe(gulp.dest(dist));
+});
+
+//Html替换img文件版本
+gulp.task('revHtmlImg', function () {
+    let json = path.resolve('..', options.dirname, 'dist/images/*.json');
+    let src  = path.resolve('..', options.dirname, 'dist/html/*.html');
+    let dist = path.resolve('..', options.dirname, 'dist/html');
+    return gulp.src([json, src])
+        .pipe(revCollector())
+        .pipe(gulp.dest(dist));
+});
+
+//Html替换js文件版本
+gulp.task('revHtmlJs', function () {
+    let json = path.resolve('..', options.dirname, 'dist/js/*.json');
+    let src  = path.resolve('..', options.dirname, 'dist/html/*.html');
+    let dist = path.resolve('..', options.dirname, 'dist/html');
+    return gulp.src([json, src])
+        .pipe(revCollector())
+        .pipe(gulp.dest(dist));
+});
+
+//css替换img文件版本
+gulp.task('revCssImg', function () {
+    let json = path.resolve('..', options.dirname, 'dist/images/*.json');
+    let src  = path.resolve('..', options.dirname, 'dist/css/*.css');
+    let dist = path.resolve('..', options.dirname, 'dist/css');
+    return gulp.src([json, src])
+        .pipe(revCollector())
+        .pipe(gulp.dest(dist));
 });

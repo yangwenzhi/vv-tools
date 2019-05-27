@@ -1,40 +1,34 @@
-var webpack = require('webpack'),
-    glob = require('glob'),
-    minimist = require('minimist'),
-    ExtractTextPlugin = require("extract-text-webpack-plugin"),
-    argv = minimist(process.argv.slice(2));
+const path     = require('path');
+const webpack  = require('webpack');
+const glob     = require('glob');
+const minimist = require('minimist');
+const argv     = minimist(process.argv.slice(2));
 
-var __dirname__ = '',
-    __file__ = '',
-    WATCH = argv.watch || argv.w,
-    min = argv.min || argv.m,
-    entry = {},
-    plugins = [
-        new webpack.DefinePlugin(),
-    ];
+let entry = {};
+let plugins = [
+    new webpack.DefinePlugin()
+];
 
-if(argv.watch || argv.w || argv.publish || argv.p) {
-    __dirname__ = argv.watch || argv.w || argv.publish || argv.p;
-}
+let options = {
+    WATCH     : argv.watch || argv.w,
+    dirname   : argv.w || argv.p || argv.watch || argv.publish || '',
+    filename  : argv.file || argv.f || '*',
+    min       : argv.min || argv.m || false
+};
 
-if(argv.file || argv.f) {
-    __file__ = argv.file || argv.f;
-}
+let reg = new RegExp(options.dirname + '\/src\/|\.js', 'gi');
+let files = glob.sync(path.resolve('..', options.dirname.toString(), 'src/vue/**', options.filename + '.js'));
 
-var fsArr = glob.sync('../' + __dirname__ + '/src/vue/**/*.js');
-
-if(__file__) fsArr = glob.sync('../' + __dirname__ + '/src/vue/**/' + __file__ + '.js');
-
-fsArr.forEach(function(item) {
-    entry[item.replace('../' + __dirname__ + '/src/vue/', '').replace('.js', '')] = item;
+files.forEach(function(item) {
+    entry[item.replace(reg, '')] = item;
 });
 
-var webpack_config = {
+let webpack_config = {
     entry: entry,
     output: {
         filename: '[name].js',
     },
-    plugins: WATCH && !min ? plugins : plugins.concat([
+    plugins: options.WATCH && !options.min ? plugins : plugins.concat([
         new webpack.optimize.UglifyJsPlugin({
             compress: {
                 warnings: false
@@ -75,7 +69,7 @@ var webpack_config = {
             }
         ]
     },
-    // watch: WATCH ? true : false,
+    // watch: options.WATCH ? true : false,
 };
 
 module.exports = webpack_config;

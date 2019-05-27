@@ -1,7 +1,7 @@
-var chalk = require('chalk'),
-	exec = require('child_process').exec;
+const chalk = require('chalk');
+const exec = require('child_process').exec;
 
-var log = {
+let log = {
 	write: function(arg, exists) {
 		switch (arg) {
 			case 'a':
