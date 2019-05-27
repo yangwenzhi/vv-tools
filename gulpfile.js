@@ -71,7 +71,7 @@ gulp.task('sass', function () {
     let dist = path.resolve('..', options.dirname, 'dist/css');
     return gulp.src(src)
         .pipe($.sass())
-        .pipe($.if(options.uglify, $.minifyCss()))
+        .pipe($.if(options.uglify || options.publish, $.minifyCss()))
         .pipe($.if(options.publish, rev()))
         .pipe($.if(options.publish, gulp.dest(dist)))
         .pipe($.if(options.publish, rev.manifest()))
@@ -88,7 +88,7 @@ gulp.task('images', function () {
     let src  = path.resolve('..', options.dirname, 'src/images', options.imagefiles, '**');
     let dist = path.resolve('..', options.dirname, 'dist/images', options.imagefiles);
     return gulp.src(src)
-        .pipe($.if(options.uglify, $.imagemin(opts)))
+        .pipe($.if(options.uglify || options.publish, $.imagemin(opts)))
         .pipe($.if(options.publish, rev()))
         .pipe($.if(options.publish, gulp.dest(dist)))
         .pipe($.if(options.publish, rev.manifest()))
@@ -123,7 +123,7 @@ gulp.task('html', function () {
     let dist = path.resolve('..', options.dirname, options.root ? '' : 'dist/html');
     return gulp.src(src)
         .pipe($.ejs({version: options.version ? config.version || new Date().getTime().toString().substr(0, 10) : ''}))
-        .pipe($.if(options.uglify, $.htmlmin(opts)))
+        .pipe($.if(options.uglify || options.publish, $.htmlmin(opts)))
         .pipe(gulp.dest(dist));
 });
 
