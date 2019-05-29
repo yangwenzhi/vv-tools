@@ -2,12 +2,11 @@
 ```
 　　1）.babelrc2 --> .babelrc
 　　2）package.json2 --> package.json
-　　3）node_modules2.zip --> node_modules.zip 并解压缩为 node_modules 文件夹
 ```
 
-解压缩当前目录
+根目录、当前目录安装
 ```
-　　1） node_modules.zip 解压缩为 node_modules 文件夹
+　　1） npm install
 ```
 
 使用说明
