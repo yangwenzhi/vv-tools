@@ -11,5 +11,5 @@
 
 使用说明
 ```
-　　http://172.16.1.47/docs/vv-live-pc/vv-tools使用指南.html
+　　https://tower.im/teams/720791/documents/445/
 ```
