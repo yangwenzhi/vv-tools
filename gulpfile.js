@@ -122,7 +122,7 @@ gulp.task('html', function () {
     let src  = path.resolve('..', options.dirname, 'src/html', options.filename + '.html');
     let dist = path.resolve('..', options.dirname, options.root ? '' : 'dist/html');
     return gulp.src(src)
-        .pipe($.ejs({version: options.version ? config.version || new Date().getTime().toString().substr(0, 10) : ''}))
+        .pipe($.ejs({cdn: config.cdn, version: options.version ? config.version || new Date().getTime().toString().substr(0, 10) : ''}))
         .pipe($.if(options.uglify || options.publish, $.htmlmin(opts)))
         .pipe(gulp.dest(dist));
 });
