@@ -28,7 +28,7 @@ let options = {
     file       : argv.file || argv.f,
     filename   : argv.file || argv.f || '*',
     imagefiles : argv.file || argv.f || '',
-    tabs       : os.platform() == 'darwin' || 'linux' ? ';' : '&'
+    tabs       : os.platform() == 'win32' ? '&' : ';'
 };
 
 console.log(options);
