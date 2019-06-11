@@ -12,6 +12,11 @@ const runSequence    = require('run-sequence');
 const rev            = require('gulp-rev');
 const revCollector   = require('gulp-rev-collector');
 const clean          = require('gulp-clean');
+const postcss        = require('gulp-postcss');
+const cssnext        = require('postcss-cssnext');
+const px2rem         = require('postcss-px2rem');
+const assets         = require('postcss-assets');
+const autoprefixer   = require('autoprefixer');
 const config         = require('./config');
 const log            = require('./log');
 const webpack_config = require('./webpack.config-common');
@@ -23,6 +28,7 @@ let options = {
     uglify     : argv.min || argv.m || false,
     root       : argv.root || argv.r || false,
     serve      : argv.serve || argv.s || false,
+    ispx       : argv.px || argv.x || false,
     dircreate  : argv.create || argv.c,
     dirname    : argv.w || argv.p || argv.watch || argv.publish,
     file       : argv.file || argv.f,
@@ -69,8 +75,19 @@ gulp.task('vue', function () {
 gulp.task('sass', function () {
     let src  = path.resolve('..', options.dirname, 'src/sass', options.filename + '.scss');
     let dist = path.resolve('..', options.dirname, 'dist/css');
+    let plugins = [
+        assets,
+        cssnext,
+        px2rem({
+            remUnit: 75
+        }),
+        // autoprefixer({
+        //     browsers: ["Android 4.1", "iOS 7.1", "Chrome > 31", "ff > 31", "ie >= 10"]
+        // }),
+    ];
     return gulp.src(src)
         .pipe($.sass())
+        .pipe($.if(options.ispx || options.publish, postcss(plugins)))
         .pipe($.if(options.uglify || options.publish, $.minifyCss()))
         .pipe($.if(options.publish, rev()))
         .pipe($.if(options.publish, gulp.dest(dist)))
@@ -173,10 +190,10 @@ gulp.task('online', function (done) {
 //监听文件
 gulp.task('watch', ['dev'], function() {
     let dir = path.resolve('..', options.dirname);
-    gulp.watch(path.resolve(dir, 'src/component/vue/*'), ['vue']);
-    gulp.watch(path.resolve(dir, 'src/component/sass/*.scss'), ['sass']);
-    gulp.watch(path.resolve(dir, 'src/component/js/*.js'), ['scripts']);
-    gulp.watch(path.resolve(dir, 'src/component/htm/*'), ['html']);
+    gulp.watch(path.resolve(dir, 'src/component/vue/**'), ['vue']);
+    gulp.watch(path.resolve(dir, 'src/component/sass/**/*.scss'), ['sass']);
+    gulp.watch(path.resolve(dir, 'src/component/js/**/*.js'), ['scripts']);
+    gulp.watch(path.resolve(dir, 'src/component/htm/**'), ['html']);
     gulp.watch(path.resolve(dir, 'src/vue/*'), ['vue']);
     gulp.watch(path.resolve(dir, 'src/sass/*.scss'), ['sass']);
     gulp.watch(path.resolve(dir, 'src/images/**'), ['images']);
@@ -217,7 +234,7 @@ gulp.task('default', function() {
         });
         return;
     }
-    if(argv.help || argv.h) {
+    if(argv.H) {
         log.write('h');
         return;
     }
