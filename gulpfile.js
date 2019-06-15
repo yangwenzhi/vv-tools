@@ -12,11 +12,11 @@ const runSequence    = require('run-sequence');
 const rev            = require('gulp-rev');
 const revCollector   = require('gulp-rev-collector');
 const clean          = require('gulp-clean');
-const postcss        = require('gulp-postcss');
-const cssnext        = require('postcss-cssnext');
-const px2rem         = require('postcss-px2rem');
-const assets         = require('postcss-assets');
-const autoprefixer   = require('autoprefixer');
+// const postcss        = require('gulp-postcss');
+// const cssnext        = require('postcss-cssnext');
+// const px2rem         = require('postcss-px2rem');
+// const assets         = require('postcss-assets');
+// const autoprefixer   = require('autoprefixer');
 const config         = require('./config');
 const log            = require('./log');
 const webpack_config = require('./webpack.config-common');
@@ -75,19 +75,19 @@ gulp.task('vue', function () {
 gulp.task('sass', function () {
     let src  = path.resolve('..', options.dirname, 'src/sass', options.filename + '.scss');
     let dist = path.resolve('..', options.dirname, 'dist/css');
-    let plugins = [
-        assets,
-        cssnext,
-        px2rem({
-            remUnit: 75
-        }),
-        // autoprefixer({
-        //     browsers: ["Android 4.1", "iOS 7.1", "Chrome > 31", "ff > 31", "ie >= 10"]
-        // }),
-    ];
+    // let plugins = [
+    //     assets,
+    //     cssnext,
+    //     px2rem({
+    //         remUnit: 75
+    //     }),
+    //     autoprefixer({
+    //         browsers: ["Android 4.1", "iOS 7.1", "Chrome > 31", "ff > 31", "ie >= 10"]
+    //     }),
+    // ];
     return gulp.src(src)
         .pipe($.sass())
-        .pipe($.if(options.ispx || options.publish, postcss(plugins)))
+        // .pipe($.if(options.ispx || options.publish, postcss(plugins)))
         .pipe($.if(options.uglify || options.publish, $.minifyCss()))
         .pipe($.if(options.publish, rev()))
         .pipe($.if(options.publish, gulp.dest(dist)))
