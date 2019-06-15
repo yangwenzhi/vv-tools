@@ -28,7 +28,7 @@ let options = {
     uglify     : argv.min || argv.m || false,
     root       : argv.root || argv.r || false,
     serve      : argv.serve || argv.s || false,
-    ispx       : argv.px || argv.x || false,
+    // ispx       : argv.px || argv.x || false,
     dircreate  : argv.create || argv.c,
     dirname    : argv.w || argv.p || argv.watch || argv.publish,
     file       : argv.file || argv.f,
