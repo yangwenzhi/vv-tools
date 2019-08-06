@@ -12,6 +12,7 @@ const runSequence    = require('run-sequence');
 const rev            = require('gulp-rev');
 const revCollector   = require('gulp-rev-collector');
 const clean          = require('gulp-clean');
+const uglify         = require('gulp-uglify');
 // const postcss        = require('gulp-postcss');
 // const cssnext        = require('postcss-cssnext');
 // const px2rem         = require('postcss-px2rem');
@@ -115,17 +116,43 @@ gulp.task('images', function () {
 //编译javascript
 gulp.task('scripts', function () {
     let src  = path.resolve('..', options.dirname, 'src/js');
-    let dist = path.resolve('..', options.dirname, 'dist/js');
+    let jsdir = path.resolve('..', options.dirname, 'dist/js');
+    let mindir = path.resolve('..', options.dirname, 'dist/.min');
     let files = [];
+    let index = 0;
     if(options.file) files.push(options.file + '.js');
     else files = fs.readdirSync(src);
 
-    fs.exists(dist, function (exists) {
-        if(!exists) fs.mkdirSync(dist);
+    fs.exists(jsdir, function (exists) {
+        if(!exists) fs.mkdir(jsdir, function() {
+            index++;
+            merge();
+        });
+    });
+    fs.exists(mindir, function (exists) {
+        if(!exists) fs.mkdir(mindir, function() {
+            index++;
+            merge();
+        });
+    });
+
+    function merge() {
+        if(index < 2) return;
         files.forEach(function(item) {
             if(/\.js/gi.test(item)) c.js(item, options.dirname, options.uglify, options.publish);
         });
-    });
+    }
+});
+
+gulp.task('scriptsRev', function () {
+    let src  = path.resolve('..', options.dirname, 'dist/.min', options.filename + '.js');
+    let dist = path.resolve('..', options.dirname, 'dist/js');
+    return gulp.src(src)
+        .pipe($.if(options.uglify || options.publish, uglify()))
+        .pipe($.if(options.publish, rev()))
+        .pipe($.if(options.publish, gulp.dest(dist)))
+        .pipe($.if(options.publish, rev.manifest()))
+        .pipe(gulp.dest(dist));
 });
 
 //编译html
@@ -161,9 +188,10 @@ gulp.task('dev', function (done) {
     //依次顺序执行
     runSequence(
         ['vue'],
-        ['sass'],
         ['images'],
         ['scripts'],
+        ['sass'],
+        ['scriptsRev'],
         ['html'],
         done);
 });
@@ -174,9 +202,10 @@ gulp.task('online', function (done) {
     runSequence(
         ['clean'],
         ['vue'],
-        ['sass'],
         ['images'],
         ['scripts'],
+        ['sass'],
+        ['scriptsRev'],
         ['html'],
         ['revHtmlVue'],
         ['revHtmlCss'],
@@ -255,7 +284,8 @@ gulp.task('cleanManifest', function(){
         path.resolve(src, 'vue/rev-manifest.json'),
         path.resolve(src, 'css/rev-manifest.json'),
         path.resolve(src, 'images/rev-manifest.json'),
-        path.resolve(src, 'js/rev-manifest.json')
+        path.resolve(src, 'js/rev-manifest.json'),
+        path.resolve(src, '.min')
     ];
     return gulp.src(config_src)
         .pipe(clean({force: true}));
