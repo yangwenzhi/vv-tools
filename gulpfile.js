@@ -211,7 +211,9 @@ gulp.task('online', function (done) {
         ['revHtmlCss'],
         ['revHtmlImg'],
         ['revHtmlJs'],
+        ['revVueImg'],
         ['revCssImg'],
+        ['revJsImg'],
         ['cleanManifest'],
         done);
 });
@@ -331,11 +333,31 @@ gulp.task('revHtmlJs', function () {
         .pipe(gulp.dest(dist));
 });
 
+//vue替换img文件版本
+gulp.task('revVueImg', function () {
+    let json = path.resolve('..', options.dirname, 'dist/images/*.json');
+    let src  = path.resolve('..', options.dirname, 'dist/vue/*.js');
+    let dist = path.resolve('..', options.dirname, 'dist/vue');
+    return gulp.src([json, src])
+        .pipe(revCollector())
+        .pipe(gulp.dest(dist));
+});
+
 //css替换img文件版本
 gulp.task('revCssImg', function () {
     let json = path.resolve('..', options.dirname, 'dist/images/*.json');
     let src  = path.resolve('..', options.dirname, 'dist/css/*.css');
     let dist = path.resolve('..', options.dirname, 'dist/css');
+    return gulp.src([json, src])
+        .pipe(revCollector())
+        .pipe(gulp.dest(dist));
+});
+
+//js替换img文件版本
+gulp.task('revJsImg', function () {
+    let json = path.resolve('..', options.dirname, 'dist/images/*.json');
+    let src  = path.resolve('..', options.dirname, 'dist/js/*.js');
+    let dist = path.resolve('..', options.dirname, 'dist/js');
     return gulp.src([json, src])
         .pipe(revCollector())
         .pipe(gulp.dest(dist));
