@@ -124,16 +124,26 @@ gulp.task('scripts', function () {
     else files = fs.readdirSync(src);
 
     fs.exists(jsdir, function (exists) {
-        if(!exists) fs.mkdir(jsdir, function() {
+        if(!exists) {
+            fs.mkdir(jsdir, function() {
+                index++;
+                merge();
+            });
+        } else {
             index++;
             merge();
-        });
+        }
     });
     fs.exists(mindir, function (exists) {
-        if(!exists) fs.mkdir(mindir, function() {
+        if(!exists) {
+            fs.mkdir(mindir, function() {
+                index++;
+                merge();
+            });
+        } else {
             index++;
             merge();
-        });
+        }
     });
 
     function merge() {
