@@ -116,42 +116,32 @@ gulp.task('images', function () {
 //编译javascript
 gulp.task('scripts', function () {
     let src  = path.resolve('..', options.dirname, 'src/js');
-    let jsdir = path.resolve('..', options.dirname, 'dist/js');
-    let mindir = path.resolve('..', options.dirname, 'dist/.min');
-    let files = [];
-    let index = 0;
+    let files = [], index = 0;
     if(options.file) files.push(options.file + '.js');
     else files = fs.readdirSync(src);
 
-    fs.exists(jsdir, function (exists) {
-        if(!exists) {
-            fs.mkdir(jsdir, function() {
-                index++;
-                merge();
-            });
-        } else {
-            index++;
-            merge();
-        }
-    });
-    fs.exists(mindir, function (exists) {
-        if(!exists) {
-            fs.mkdir(mindir, function() {
-                index++;
-                merge();
-            });
-        } else {
-            index++;
-            merge();
-        }
-    });
+    toMerge(path.resolve('..', options.dirname, 'dist/js'));
+    toMerge(path.resolve('..', options.dirname, 'dist/.min'));
 
+    function toMerge(f) {
+        fs.exists(f, function (exists) {
+            if(!exists) {
+                fs.mkdir(f, function() {
+                    index++;
+                    merge();
+                });
+            } else {
+                index++;
+                merge();
+            }
+        });
+    };
     function merge() {
         if(index < 2) return;
         files.forEach(function(item) {
             if(/\.js/gi.test(item)) c.js(item, options.dirname, options.uglify, options.publish);
         });
-    }
+    };
 });
 
 gulp.task('scriptsRev', function () {
@@ -162,7 +152,7 @@ gulp.task('scriptsRev', function () {
         .pipe($.if(options.publish, rev()))
         .pipe($.if(options.publish, gulp.dest(dist)))
         .pipe($.if(options.publish, rev.manifest()))
-        .pipe(gulp.dest(dist));
+        .pipe($.if(options.uglify || options.publish, gulp.dest(dist)));
 });
 
 //编译html
