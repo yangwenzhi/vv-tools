@@ -9,7 +9,7 @@
     "autoprefixer": "^9.6.0",
     "bingo-builder": "0.0.1",
     "chalk": "^1.1.1",
-    "debug": "~2.0.0",
+    "debug": "~4.1.1",
     "express": "~4.9.0",
     "extract-text-webpack-plugin": "^2.1.2",
     "file-loader": "^0.11.2",
