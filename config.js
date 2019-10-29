@@ -1,5 +1,5 @@
 let config = {
-	version: '1.0',
+	version: '',
 	chrome: {
 		proxy: 'http://music.51vv.com/',
 	    startPath: 'vv-musiclive-wx/m/' //移动
